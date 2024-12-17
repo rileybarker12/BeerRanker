@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pairwise Ranking Beers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: left; /* Text is left-aligned now */
+            margin: 0 auto;
+            max-width: 600px; /* Keeps content neatly wrapped */
+        }
+        #beerImage {
+            width: 100px;
+            margin: 20px 0;
+        }
+        #beers {
+            list-style: none;
+            padding: 0;
+        }
+        #beers li {
+            margin: 5px 0;
+        }
+        .pair {
+            margin: 10px 0;
+            padding: 5px;
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: space-around;
+        }
+        .pair button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .pair button:hover {
+            background-color: #f0f0f0;
+        }
+        .selection-section {
+            margin-bottom: 20px;
+        }
+        #omittedBeers {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Beer Clip Art -->
+    <img id="beerImage" src="https://www.shutterstock.com/shutterstock/photos/1497355484/display_1500/stock-vector-beer-mug-vector-clipart-design-1497355484.jpg" alt="Beer Clip Art">
+    
+    <h1>Beers Pairwise Ranking</h1>
+    <p id="introMessage">Select beers you've never tried, and they will be omitted from the rankings.</p>
+
+    <!-- Step 1: Beer Selection -->
+    <div class="selection-section">
+        <h3>Select Beers You've Never Tried</h3>
+        <form id="beerSelectionForm">
+            <!-- Checkboxes will be added dynamically -->
+        </form>
+        <button id="startRanking">Start Ranking</button>
+    </div>
+
+    <!-- Step 2: Pairwise Comparison -->
+    <div id="pairwiseContainer" style="display: none;"></div>
+    <h3>Final Rankings:</h3>
+    <ul id="beers"></ul>
+
+    <!-- Step 3: Omitted Beers -->
+    <div id="omittedBeers" style="display: none;">
+        <h3>Omitted Beers (Never Tried):</h3>
+        <ul id="omittedList"></ul>
+    </div>
+
+<script>
+    const beers = [
+        "Budweiser","Bud Light","Coors Light","Heineken","Michelob Ultra","Miller Lite","Modelo","Corona","Guinness","Blue Moon","Ice Beer","Miller High Life","Yuengling","Dos Equis","Natty Light","Keystone"
+    ];
+
+    let untriedBeers = new Set(); // Beers marked as untried
+    let rankedBeers = []; // Stores the final ranking
+
+    // Dynamically generate the beer selection form with checkboxes
+function generateSelectionForm() {
+    const form = document.getElementById('beerSelectionForm');
+    
+    // Sort beers alphabetically before creating checkboxes
+    const sortedBeers = beers.slice().sort((a, b) => a.localeCompare(b));
+    
+    sortedBeers.forEach((beer, index) => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = beer;
+        checkbox.id = `beer-${index}`;
+        checkbox.onchange = toggleStartButton;
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(beer));
+        label.style.display = 'block';
+        form.appendChild(label);
+    });
+}
+
+
+    // Enable or disable the "Start Ranking" button based on selections
+    function toggleStartButton() {
+        const startButton = document.getElementById('startRanking');
+        const checkboxes = document.querySelectorAll('#beerSelectionForm input[type="checkbox"]');
+        //startButton.disabled = !Array.from(checkboxes).some(checkbox => checkbox.checked);
+    }
+
+    // Start the ranking process after selecting untried beers
+    function startRanking() {
+        // Clear previous selections and initialize ranking process
+        untriedBeers.clear();
+        rankedBeers = [];
+
+        const checkboxes = document.querySelectorAll('#beerSelectionForm input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                untriedBeers.add(checkbox.value); // Mark as untried
+            }
+        });
+
+        // Filter out untried beers from the list
+        const remainingBeers = beers.filter(beer => !untriedBeers.has(beer));
+
+        // Hide the selection form and intro message, show the ranking interface
+        document.querySelector('.selection-section').style.display = 'none';
+        document.getElementById('introMessage').style.display = 'none';
+        document.getElementById('pairwiseContainer').style.display = 'block';
+
+        // Start the ranking process using a modified merge sort
+        rankBeers(remainingBeers);
+    }
+
+    // Perform a modified merge sort with pairwise comparisons
+    function rankBeers(beerList) {
+        if (beerList.length <= 1) {
+            rankedBeers.push(...beerList);
+            displayRanking();
+            return;
+        }
+
+        mergeSort(beerList, sortedList => {
+            rankedBeers = sortedList;
+            displayRanking();
+        });
+    }
+
+    function mergeSort(beers, callback) {
+        if (beers.length <= 1) {
+            callback(beers);
+            return;
+        }
+
+        const mid = Math.floor(beers.length / 2);
+        const left = beers.slice(0, mid);
+        const right = beers.slice(mid);
+
+        mergeSort(left, sortedLeft => {
+            mergeSort(right, sortedRight => {
+                merge(sortedLeft, sortedRight, callback);
+            });
+        });
+    }
+
+    function merge(left, right, callback) {
+        let i = 0, j = 0;
+        const sortedList = [];
+
+        function compareNext() {
+            if (i < left.length && j < right.length) {
+                displayPair([left[i], right[j]], winner => {
+                    if (winner === left[i]) {
+                        sortedList.push(left[i]);
+                        i++;
+                    } else {
+                        sortedList.push(right[j]);
+                        j++;
+                    }
+                    compareNext();
+                });
+            } else {
+                while (i < left.length) sortedList.push(left[i++]);
+                while (j < right.length) sortedList.push(right[j++]);
+                callback(sortedList);
+            }
+        }
+
+        compareNext();
+    }
+
+    function displayPair(pair, callback) {
+        const container = document.getElementById("pairwiseContainer");
+        container.innerHTML = "";
+
+        const pairElement = document.createElement("div");
+        pairElement.classList.add("pair");
+
+        const button1 = document.createElement("button");
+        button1.innerText = pair[0];
+        button1.onclick = () => callback(pair[0]);
+
+        const button2 = document.createElement("button");
+        button2.innerText = pair[1];
+        button2.onclick = () => callback(pair[1]);
+
+        pairElement.appendChild(button1);
+        pairElement.appendChild(button2);
+        container.appendChild(pairElement);
+    }
+
+    function displayRanking() {
+        const container = document.getElementById("pairwiseContainer");
+        container.innerHTML = "<p>Ranking complete!</p>";
+
+        const rankingList = document.getElementById("beers");
+        rankingList.innerHTML = "";
+
+        rankedBeers.forEach((beer, index) => {
+            const listItem = document.createElement("li");
+            listItem.innerText = `${index + 1}. ${beer}`;
+            rankingList.appendChild(listItem);
+        });
+
+        displayOmittedBeers();
+    }
+
+    function displayOmittedBeers() {
+        const omittedList = document.getElementById("omittedList");
+        omittedList.innerHTML = "";
+
+        untriedBeers.forEach(beer => {
+            const listItem = document.createElement("li");
+            listItem.innerText = beer;
+            omittedList.appendChild(listItem);
+        });
+
+        document.getElementById("omittedBeers").style.display = 'block';
+    }
+
+    generateSelectionForm();
+    document.getElementById('startRanking').addEventListener('click', startRanking);
+</script>
+</body>
+</html>
