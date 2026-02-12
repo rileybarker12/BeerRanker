@@ -5,48 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pairwise Ranking Beers</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             font-family: Arial, sans-serif;
-            text-align: left; /* Text is left-aligned now */
+            text-align: left;
             margin: 0 auto;
-            max-width: 600px; /* Keeps content neatly wrapped */
+            max-width: 700px;
+            padding: 0 16px;
+            color: #222;
         }
         #beerImage {
             width: 100px;
             margin: 20px 0;
         }
-        #beers {
-            list-style: none;
-            padding: 0;
+        h1 {
+            margin-bottom: 4px;
         }
-        #beers li {
-            margin: 5px 0;
+
+        /* Progress Bar */
+        #progressContainer {
+            display: none;
+            margin: 16px 0;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 24px;
+            position: relative;
         }
-        .pair {
-            margin: 10px 0;
-            padding: 5px;
-            border: 1px solid #ccc;
+        #progressBar {
+            height: 100%;
+            background: linear-gradient(90deg, #f7b733, #fc4a1a);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        #progressText {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             display: flex;
-            justify-content: space-around;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: bold;
+            color: #333;
         }
-        .pair button {
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .pair button:hover {
-            background-color: #f0f0f0;
-        }
+
+        /* Selection Form */
         .selection-section {
             margin-bottom: 20px;
         }
-        #omittedBeers {
-            margin-top: 20px;
+        #beerSelectionForm {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
         }
-        #restartButton {
-            display: none; /* Hidden by default */
-            margin-top: 20px;
-            padding: 10px;
+        #beerSelectionForm label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        #beerSelectionForm label:hover {
+            background: #f5f5f5;
+        }
+        #beerSelectionForm label img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        #beerSelectionForm label span {
+            font-size: 14px;
+        }
+        #startRanking {
+            padding: 12px 28px;
             font-size: 16px;
             cursor: pointer;
             background-color: #007BFF;
@@ -54,17 +96,199 @@
             border: none;
             border-radius: 5px;
         }
+        #startRanking:hover {
+            background-color: #0056b3;
+        }
+
+        /* Pairwise Comparison */
+        #pairwiseContainer {
+            display: none;
+        }
+        .pair {
+            margin: 10px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-around;
+            align-items: stretch;
+            gap: 20px;
+        }
+        .pair-button {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #fafafa;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: all 0.15s;
+        }
+        .pair-button:hover {
+            background-color: #e8f0fe;
+            border-color: #007BFF;
+            transform: scale(1.02);
+        }
+        .pair-button img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+        .pair-vs {
+            display: flex;
+            align-items: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #999;
+        }
+
+        /* Rankings */
+        #beers {
+            list-style: none;
+            padding: 0;
+        }
+        #beers li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            margin: 4px 0;
+            border-radius: 8px;
+        }
+        #beers li:nth-child(-n+3) {
+            background: linear-gradient(90deg, #fff9e6, #fff);
+        }
+        #beers li img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+        .rank-number {
+            font-weight: bold;
+            min-width: 28px;
+            color: #555;
+        }
+        #beers li:nth-child(1) .rank-number { color: #d4a017; font-size: 20px; }
+        #beers li:nth-child(2) .rank-number { color: #888; font-size: 18px; }
+        #beers li:nth-child(3) .rank-number { color: #a0522d; font-size: 17px; }
+
+        #omittedBeers {
+            margin-top: 20px;
+        }
+
+        /* Buttons */
+        #restartButton, #shareButton {
+            display: none;
+            margin-top: 12px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+        }
+        #restartButton {
+            background-color: #007BFF;
+        }
         #restartButton:hover {
             background-color: #0056b3;
+        }
+        #shareButton {
+            background-color: #28a745;
+            margin-left: 8px;
+        }
+        #shareButton:hover {
+            background-color: #1e7e34;
+        }
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* Share Modal */
+        #shareModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        #shareModal.active {
+            display: flex;
+        }
+        .share-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+        }
+        .share-content h3 {
+            margin-top: 0;
+        }
+        .share-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 16px 0;
+        }
+        .share-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+        }
+        .share-btn.copy { background: #555; }
+        .share-btn.copy:hover { background: #333; }
+        .share-btn.twitter { background: #1da1f2; }
+        .share-btn.twitter:hover { background: #0c85d0; }
+        .share-btn.facebook { background: #1877f2; }
+        .share-btn.facebook:hover { background: #0d5ecf; }
+        .share-btn.sms { background: #34c759; }
+        .share-btn.sms:hover { background: #28a03e; }
+        .share-close {
+            margin-top: 10px;
+            padding: 8px 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .share-close:hover { background: #f5f5f5; }
+        #copyConfirm {
+            color: #28a745;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
         }
     </style>
 </head>
 <body>
     <!-- Beer Clip Art -->
     <img id="beerImage" src="https://www.shutterstock.com/shutterstock/photos/1497355484/display_1500/stock-vector-beer-mug-vector-clipart-design-1497355484.jpg" alt="Beer Clip Art">
-    
+
     <h1>Beers Pairwise Ranking</h1>
     <p id="introMessage">Select beers you've never tried, and they will be omitted from the rankings.</p>
+
+    <!-- Progress Bar -->
+    <div id="progressContainer">
+        <div id="progressBar"></div>
+        <div id="progressText">0%</div>
+    </div>
 
     <!-- Step 1: Beer Selection -->
     <div class="selection-section">
@@ -76,8 +300,8 @@
     </div>
 
     <!-- Step 2: Pairwise Comparison -->
-    <div id="pairwiseContainer" style="display: none;"></div>
-    
+    <div id="pairwiseContainer"></div>
+
     <!-- Final Rankings -->
     <h3 id="finalRankingHeading" style="display: none;">Final Rankings:</h3>
     <ul id="beers"></ul>
@@ -88,33 +312,153 @@
         <ul id="omittedList"></ul>
     </div>
 
-    <!-- Restart Button -->
-    <button id="restartButton">Restart</button>
+    <!-- Action Buttons -->
+    <div class="button-row">
+        <button id="restartButton">Restart</button>
+        <button id="shareButton">Share With Friends</button>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal">
+        <div class="share-content">
+            <h3>Share Your Rankings</h3>
+            <div class="share-options">
+                <button class="share-btn copy" onclick="copyRankings()">Copy to Clipboard</button>
+                <p id="copyConfirm">Copied!</p>
+                <button class="share-btn twitter" onclick="shareTwitter()">Share on X (Twitter)</button>
+                <button class="share-btn facebook" onclick="shareFacebook()">Share on Facebook</button>
+                <button class="share-btn sms" onclick="shareSMS()">Share via Text Message</button>
+            </div>
+            <button class="share-close" onclick="closeShareModal()">Close</button>
+        </div>
+    </div>
 
 <script>
     const beers = [
-        "Budweiser", "Bud Light", "Coors Light", "Heineken", "Michelob Ultra", "Miller Lite", "Modelo",
-        "Corona", "Guinness", "Blue Moon", "Ice Beer", "Miller High Life", "Yuengling", 
-        "Dos Equis", "Natty Light", "Keystone","Shiner","Busch Light","Coors Banquet","PBR","Stella Artois","Lone Star"
+        {
+            name: "Bud Light",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Bud_Light_can_%282023%29.png/120px-Bud_Light_can_%282023%29.png"
+        },
+        {
+            name: "Modelo Especial",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Modelo_Especial_lata.png/100px-Modelo_Especial_lata.png"
+        },
+        {
+            name: "Michelob Ultra",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Michelob_Ultra_bottle.png/60px-Michelob_Ultra_bottle.png"
+        },
+        {
+            name: "Coors Light",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Coors_Light.png/120px-Coors_Light.png"
+        },
+        {
+            name: "Miller Lite",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Miller_Lite_Can.png/100px-Miller_Lite_Can.png"
+        },
+        {
+            name: "Corona Extra",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Corona-6Pack.JPG/150px-Corona-6Pack.JPG"
+        },
+        {
+            name: "Budweiser",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Budweiser_new.jpg/120px-Budweiser_new.jpg"
+        },
+        {
+            name: "Heineken",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Heineken.jpg/120px-Heineken.jpg"
+        },
+        {
+            name: "Busch Light",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Busch_Light_can.jpg/100px-Busch_Light_can.jpg"
+        },
+        {
+            name: "Natural Light",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Natural_Light_12_FL_OZ_can.jpg/100px-Natural_Light_12_FL_OZ_can.jpg"
+        },
+        {
+            name: "Dos Equis",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Dos_Equis_logo.svg/150px-Dos_Equis_logo.svg.png"
+        },
+        {
+            name: "Blue Moon",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Blue_Moon_Brewing_Company_logo.svg/120px-Blue_Moon_Brewing_Company_logo.svg.png"
+        },
+        {
+            name: "Stella Artois",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Stella_Artois_logo.svg/150px-Stella_Artois_logo.svg.png"
+        },
+        {
+            name: "Guinness",
+            img: "https://upload.wikimedia.org/wikipedia/en/thumb/f/fe/Guinness_logo.svg/120px-Guinness_logo.svg.png"
+        },
+        {
+            name: "Yuengling",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Yuengling_logo.svg/150px-Yuengling_logo.svg.png"
+        },
+        {
+            name: "Pabst Blue Ribbon",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PBR_Logo.svg/120px-PBR_Logo.svg.png"
+        },
+        {
+            name: "Sam Adams",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Samuel_Adams_%28beer%29_logo.svg/150px-Samuel_Adams_%28beer%29_logo.svg.png"
+        },
+        {
+            name: "Miller High Life",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Miller_High_Life_logo.svg/120px-Miller_High_Life_logo.svg.png"
+        },
+        {
+            name: "Keystone Light",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Keystone_Light_Logo.svg/150px-Keystone_Light_Logo.svg.png"
+        },
+        {
+            name: "Coors Banquet",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Coors_Banquet_logo.svg/150px-Coors_Banquet_logo.svg.png"
+        }
     ];
 
-    let untriedBeers = new Set(); // Beers marked as untried
-    let rankedBeers = []; // Stores the final ranking
+    let untriedBeers = new Set();
+    let rankedBeers = [];
+    let totalComparisons = 0;
+    let completedComparisons = 0;
+
+    // Estimate total comparisons for merge sort: n * ceil(log2(n))
+    function estimateComparisons(n) {
+        if (n <= 1) return 0;
+        return n * Math.ceil(Math.log2(n));
+    }
+
+    function updateProgress() {
+        const pct = totalComparisons > 0 ? Math.min(Math.round((completedComparisons / totalComparisons) * 100), 100) : 0;
+        document.getElementById('progressBar').style.width = pct + '%';
+        document.getElementById('progressText').textContent = pct + '%';
+    }
+
+    function getBeerByName(name) {
+        return beers.find(b => b.name === name);
+    }
 
     function generateSelectionForm() {
         const form = document.getElementById('beerSelectionForm');
-        const sortedBeers = beers.slice().sort((a, b) => a.localeCompare(b)); // Sort alphabetically
+        const sortedBeers = beers.slice().sort((a, b) => a.name.localeCompare(b.name));
 
         sortedBeers.forEach((beer, index) => {
             const label = document.createElement('label');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.value = beer;
+            checkbox.value = beer.name;
             checkbox.id = `beer-${index}`;
 
+            const img = document.createElement('img');
+            img.src = beer.img;
+            img.alt = beer.name;
+
+            const span = document.createElement('span');
+            span.textContent = beer.name;
+
             label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(beer));
-            label.style.display = 'block';
+            label.appendChild(img);
+            label.appendChild(span);
             form.appendChild(label);
         });
     }
@@ -122,6 +466,7 @@
     function startRanking() {
         untriedBeers.clear();
         rankedBeers = [];
+        completedComparisons = 0;
 
         const checkboxes = document.querySelectorAll('#beerSelectionForm input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
@@ -130,11 +475,14 @@
             }
         });
 
-        const remainingBeers = beers.filter(beer => !untriedBeers.has(beer));
+        const remainingBeers = beers.map(b => b.name).filter(name => !untriedBeers.has(name));
+        totalComparisons = estimateComparisons(remainingBeers.length);
 
         document.querySelector('.selection-section').style.display = 'none';
         document.getElementById('introMessage').style.display = 'none';
         document.getElementById('pairwiseContainer').style.display = 'block';
+        document.getElementById('progressContainer').style.display = 'block';
+        updateProgress();
 
         rankBeers(remainingBeers);
     }
@@ -152,15 +500,15 @@
         });
     }
 
-    function mergeSort(beers, callback) {
-        if (beers.length <= 1) {
-            callback(beers);
+    function mergeSort(beerNames, callback) {
+        if (beerNames.length <= 1) {
+            callback(beerNames);
             return;
         }
 
-        const mid = Math.floor(beers.length / 2);
-        const left = beers.slice(0, mid);
-        const right = beers.slice(mid);
+        const mid = Math.floor(beerNames.length / 2);
+        const left = beerNames.slice(0, mid);
+        const right = beerNames.slice(mid);
 
         mergeSort(left, sortedLeft => {
             mergeSort(right, sortedRight => {
@@ -183,6 +531,8 @@
                         sortedList.push(right[j]);
                         j++;
                     }
+                    completedComparisons++;
+                    updateProgress();
                     compareNext();
                 });
             } else {
@@ -199,42 +549,91 @@
         const container = document.getElementById("pairwiseContainer");
         container.innerHTML = "";
 
+        const heading = document.createElement("p");
+        heading.innerHTML = "<strong>Which do you prefer?</strong>";
+        heading.style.textAlign = "center";
+        container.appendChild(heading);
+
         const pairElement = document.createElement("div");
         pairElement.classList.add("pair");
 
+        const beer1 = getBeerByName(pair[0]);
+        const beer2 = getBeerByName(pair[1]);
+
         const button1 = document.createElement("button");
-        button1.innerText = pair[0];
+        button1.classList.add("pair-button");
+        const img1 = document.createElement("img");
+        img1.src = beer1 ? beer1.img : "";
+        img1.alt = pair[0];
+        button1.appendChild(img1);
+        button1.appendChild(document.createTextNode(pair[0]));
         button1.onclick = () => callback(pair[0]);
 
+        const vs = document.createElement("div");
+        vs.classList.add("pair-vs");
+        vs.textContent = "vs";
+
         const button2 = document.createElement("button");
-        button2.innerText = pair[1];
+        button2.classList.add("pair-button");
+        const img2 = document.createElement("img");
+        img2.src = beer2 ? beer2.img : "";
+        img2.alt = pair[1];
+        button2.appendChild(img2);
+        button2.appendChild(document.createTextNode(pair[1]));
         button2.onclick = () => callback(pair[1]);
 
         pairElement.appendChild(button1);
+        pairElement.appendChild(vs);
         pairElement.appendChild(button2);
         container.appendChild(pairElement);
     }
 
     function displayRanking() {
-        document.getElementById("pairwiseContainer").innerHTML = "<p>Ranking complete!</p>";
-        document.getElementById("finalRankingHeading").style.display = 'block'; // Show heading
+        // Complete the progress bar
+        completedComparisons = totalComparisons;
+        updateProgress();
+
+        document.getElementById("pairwiseContainer").style.display = "none";
+        document.getElementById("progressContainer").style.display = "none";
+        document.getElementById("finalRankingHeading").style.display = 'block';
 
         const rankingList = document.getElementById("beers");
         rankingList.innerHTML = "";
 
-        rankedBeers.forEach((beer, index) => {
+        rankedBeers.forEach((beerName, index) => {
+            const beer = getBeerByName(beerName);
             const listItem = document.createElement("li");
-            listItem.innerText = `${index + 1}. ${beer}`;
+
+            const rankSpan = document.createElement("span");
+            rankSpan.classList.add("rank-number");
+            rankSpan.textContent = `#${index + 1}`;
+
+            const img = document.createElement("img");
+            img.src = beer ? beer.img : "";
+            img.alt = beerName;
+
+            const nameSpan = document.createElement("span");
+            nameSpan.textContent = beerName;
+
+            listItem.appendChild(rankSpan);
+            listItem.appendChild(img);
+            listItem.appendChild(nameSpan);
             rankingList.appendChild(listItem);
         });
 
         displayOmittedBeers();
-        document.getElementById("restartButton").style.display = 'block'; // Show restart button
+        document.getElementById("restartButton").style.display = 'inline-block';
+        document.getElementById("shareButton").style.display = 'inline-block';
     }
 
     function displayOmittedBeers() {
         const omittedList = document.getElementById("omittedList");
         omittedList.innerHTML = "";
+
+        if (untriedBeers.size === 0) {
+            document.getElementById("omittedBeers").style.display = 'none';
+            return;
+        }
 
         untriedBeers.forEach(beer => {
             const listItem = document.createElement("li");
@@ -245,12 +644,60 @@
         document.getElementById("omittedBeers").style.display = 'block';
     }
 
+    function getRankingsText() {
+        let text = "My Beer Rankings:\n";
+        rankedBeers.forEach((beer, index) => {
+            text += `${index + 1}. ${beer}\n`;
+        });
+        text += "\nRank your own beers at this site!";
+        return text;
+    }
+
+    function copyRankings() {
+        const text = getRankingsText();
+        navigator.clipboard.writeText(text).then(() => {
+            const confirm = document.getElementById('copyConfirm');
+            confirm.style.display = 'block';
+            setTimeout(() => { confirm.style.display = 'none'; }, 2000);
+        });
+    }
+
+    function shareTwitter() {
+        const top3 = rankedBeers.slice(0, 3).map((b, i) => `${i + 1}. ${b}`).join(', ');
+        const text = encodeURIComponent(`My top 3 beers: ${top3} - Rank yours!`);
+        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+    }
+
+    function shareFacebook() {
+        const text = encodeURIComponent(`My top beer is ${rankedBeers[0]}! What's yours?`);
+        window.open(`https://www.facebook.com/sharer/sharer.php?quote=${text}`, '_blank');
+    }
+
+    function shareSMS() {
+        const text = encodeURIComponent(getRankingsText());
+        window.open(`sms:?body=${text}`, '_blank');
+    }
+
+    function openShareModal() {
+        document.getElementById('shareModal').classList.add('active');
+    }
+
+    function closeShareModal() {
+        document.getElementById('shareModal').classList.remove('active');
+    }
+
     function restart() {
-        location.reload(); // Reload the page to restart
+        location.reload();
     }
 
     document.getElementById('startRanking').addEventListener('click', startRanking);
     document.getElementById('restartButton').addEventListener('click', restart);
+    document.getElementById('shareButton').addEventListener('click', openShareModal);
+
+    // Close modal on background click
+    document.getElementById('shareModal').addEventListener('click', function(e) {
+        if (e.target === this) closeShareModal();
+    });
 
     generateSelectionForm();
 </script>
