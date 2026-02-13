@@ -32,10 +32,50 @@
         p {
             color: #8e8e93;
         }
-        #beerImage {
-            width: 80px;
-            margin: 24px 0 8px;
-            border-radius: 8px;
+
+        /* Neon Beer Ranker Animation */
+        #neonHeader {
+            text-align: center;
+            margin: 30px 0 20px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            animation: neonFlash 2s ease-in-out infinite;
+        }
+        @keyframes neonFlash {
+            0%, 100% {
+                color: #ff00ff;
+                text-shadow:
+                    0 0 10px #ff00ff,
+                    0 0 20px #ff00ff,
+                    0 0 30px #ff00ff,
+                    0 0 40px #ff00ff;
+            }
+            25% {
+                color: #00ffff;
+                text-shadow:
+                    0 0 10px #00ffff,
+                    0 0 20px #00ffff,
+                    0 0 30px #00ffff,
+                    0 0 40px #00ffff;
+            }
+            50% {
+                color: #ffff00;
+                text-shadow:
+                    0 0 10px #ffff00,
+                    0 0 20px #ffff00,
+                    0 0 30px #ffff00,
+                    0 0 40px #ffff00;
+            }
+            75% {
+                color: #ff6600;
+                text-shadow:
+                    0 0 10px #ff6600,
+                    0 0 20px #ff6600,
+                    0 0 30px #ff6600,
+                    0 0 40px #ff6600;
+            }
         }
 
         /* Progress Bar */
@@ -101,21 +141,16 @@
             background: rgba(255,59,48,0.15);
             border-color: rgba(255,59,48,0.4);
         }
-        #beerSelectionForm label img,
         #beerSelectionForm label .beer-emoji-fallback {
             width: 36px;
             height: 36px;
-            object-fit: contain;
-            border-radius: 6px;
-            flex-shrink: 0;
-        }
-        .beer-emoji-fallback {
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             background: rgba(255,255,255,0.05);
             border-radius: 6px;
+            flex-shrink: 0;
         }
         #beerSelectionForm label span {
             font-size: 14px;
@@ -189,13 +224,9 @@
         .pair-button:active {
             transform: scale(0.97);
         }
-        .pair-button img,
         .pair-button .beer-emoji-fallback-lg {
             width: 80px;
             height: 80px;
-            object-fit: contain;
-        }
-        .beer-emoji-fallback-lg {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -231,11 +262,13 @@
             background: rgba(255,214,10,0.08);
             border-color: rgba(255,214,10,0.15);
         }
-        #beers li img,
         #beers li .beer-emoji-fallback {
             width: 40px;
             height: 40px;
-            object-fit: contain;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
         }
         .rank-number {
             font-weight: 600;
@@ -376,8 +409,8 @@
     </style>
 </head>
 <body>
-    <!-- Beer Clip Art -->
-    <img id="beerImage" src="https://www.shutterstock.com/shutterstock/photos/1497355484/display_1500/stock-vector-beer-mug-vector-clipart-design-1497355484.jpg" alt="Beer Clip Art" onerror="this.style.display='none'">
+    <!-- Neon Beer Ranker Header -->
+    <div id="neonHeader">BEER RANKER</div>
 
     <h1>Beers Pairwise Ranking</h1>
     <p id="introMessage">Select beers you've never tried, and they will be omitted from the rankings.</p>
@@ -433,88 +466,29 @@
 
 <script>
     const BEER_EMOJI = '\u{1F37A}';
+    const SITE_URL = 'https://rileybarker12.github.io/BeerRanker/';
 
     const beers = [
-        {
-            name: "Bud Light",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Bud_Light_can_%282023%29.png/120px-Bud_Light_can_%282023%29.png"
-        },
-        {
-            name: "Modelo Especial",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Modelo_Especial_lata.png/100px-Modelo_Especial_lata.png"
-        },
-        {
-            name: "Michelob Ultra",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Michelob_Ultra_bottle.png/60px-Michelob_Ultra_bottle.png"
-        },
-        {
-            name: "Coors Light",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Coors_Light.png/120px-Coors_Light.png"
-        },
-        {
-            name: "Miller Lite",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Miller_Lite_Can.png/100px-Miller_Lite_Can.png"
-        },
-        {
-            name: "Corona Extra",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Corona-6Pack.JPG/150px-Corona-6Pack.JPG"
-        },
-        {
-            name: "Budweiser",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Budweiser_new.jpg/120px-Budweiser_new.jpg"
-        },
-        {
-            name: "Heineken",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Heineken.jpg/120px-Heineken.jpg"
-        },
-        {
-            name: "Busch Light",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Busch_Light_can.jpg/100px-Busch_Light_can.jpg"
-        },
-        {
-            name: "Natural Light",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Natural_Light_12_FL_OZ_can.jpg/100px-Natural_Light_12_FL_OZ_can.jpg"
-        },
-        {
-            name: "Dos Equis",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Dos_Equis_logo.svg/150px-Dos_Equis_logo.svg.png"
-        },
-        {
-            name: "Blue Moon",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Blue_Moon_Brewing_Company_logo.svg/120px-Blue_Moon_Brewing_Company_logo.svg.png"
-        },
-        {
-            name: "Stella Artois",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Stella_Artois_logo.svg/150px-Stella_Artois_logo.svg.png"
-        },
-        {
-            name: "Guinness",
-            img: "https://upload.wikimedia.org/wikipedia/en/thumb/f/fe/Guinness_logo.svg/120px-Guinness_logo.svg.png"
-        },
-        {
-            name: "Yuengling",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Yuengling_logo.svg/150px-Yuengling_logo.svg.png"
-        },
-        {
-            name: "Pabst Blue Ribbon",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PBR_Logo.svg/120px-PBR_Logo.svg.png"
-        },
-        {
-            name: "Sam Adams",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Samuel_Adams_%28beer%29_logo.svg/150px-Samuel_Adams_%28beer%29_logo.svg.png"
-        },
-        {
-            name: "Miller High Life",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Miller_High_Life_logo.svg/120px-Miller_High_Life_logo.svg.png"
-        },
-        {
-            name: "Keystone Light",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Keystone_Light_Logo.svg/150px-Keystone_Light_Logo.svg.png"
-        },
-        {
-            name: "Coors Banquet",
-            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Coors_Banquet_logo.svg/150px-Coors_Banquet_logo.svg.png"
-        }
+        { name: "Bud Light" },
+        { name: "Modelo Especial" },
+        { name: "Michelob Ultra" },
+        { name: "Coors Light" },
+        { name: "Miller Lite" },
+        { name: "Corona Extra" },
+        { name: "Budweiser" },
+        { name: "Heineken" },
+        { name: "Busch Light" },
+        { name: "Natural Light" },
+        { name: "Dos Equis" },
+        { name: "Blue Moon" },
+        { name: "Stella Artois" },
+        { name: "Guinness" },
+        { name: "Yuengling" },
+        { name: "Pabst Blue Ribbon" },
+        { name: "Sam Adams" },
+        { name: "Miller High Life" },
+        { name: "Keystone Light" },
+        { name: "Coors Banquet" }
     ];
 
     let untriedBeers = new Set();
@@ -522,10 +496,11 @@
     let totalComparisons = 0;
     let completedComparisons = 0;
 
-    // Estimate total comparisons for merge sort: n * ceil(log2(n))
+    // Better estimate for merge sort comparisons: closer to n*log2(n)
     function estimateComparisons(n) {
         if (n <= 1) return 0;
-        return n * Math.ceil(Math.log2(n));
+        // Average case is closer to n*log2(n), not n*ceil(log2(n))
+        return Math.floor(n * Math.log2(n) * 1.2); // 1.2x for safety margin
     }
 
     function updateProgress() {
@@ -539,21 +514,14 @@
         return beers.find(b => b.name === name);
     }
 
-    // Create a fallback element for when images fail to load
-    function createBeerImg(src, alt, cssClass) {
-        const img = document.createElement('img');
-        img.src = src;
-        img.alt = alt;
-        img.loading = 'lazy';
-        img.onerror = function() {
-            const fallback = document.createElement('div');
-            fallback.className = cssClass || 'beer-emoji-fallback';
-            fallback.textContent = BEER_EMOJI;
-            fallback.setAttribute('role', 'img');
-            fallback.setAttribute('aria-label', alt);
-            this.parentNode.replaceChild(fallback, this);
-        };
-        return img;
+    // Create beer emoji fallback (no images, just emoji)
+    function createBeerEmoji(cssClass) {
+        const fallback = document.createElement('div');
+        fallback.className = cssClass || 'beer-emoji-fallback';
+        fallback.textContent = BEER_EMOJI;
+        fallback.setAttribute('role', 'img');
+        fallback.setAttribute('aria-label', 'Beer');
+        return fallback;
     }
 
     function generateSelectionForm() {
@@ -567,13 +535,13 @@
             checkbox.value = beer.name;
             checkbox.id = `beer-${index}`;
 
-            const img = createBeerImg(beer.img, beer.name, 'beer-emoji-fallback');
+            const emoji = createBeerEmoji('beer-emoji-fallback');
 
             const span = document.createElement('span');
             span.textContent = beer.name;
 
             label.appendChild(checkbox);
-            label.appendChild(img);
+            label.appendChild(emoji);
             label.appendChild(span);
             form.appendChild(label);
         });
@@ -673,13 +641,10 @@
         const pairElement = document.createElement("div");
         pairElement.classList.add("pair");
 
-        const beer1 = getBeerByName(pair[0]);
-        const beer2 = getBeerByName(pair[1]);
-
         const button1 = document.createElement("button");
         button1.classList.add("pair-button");
-        const img1 = createBeerImg(beer1 ? beer1.img : "", pair[0], 'beer-emoji-fallback-lg');
-        button1.appendChild(img1);
+        const emoji1 = createBeerEmoji('beer-emoji-fallback-lg');
+        button1.appendChild(emoji1);
         button1.appendChild(document.createTextNode(pair[0]));
         button1.onclick = () => callback(pair[0]);
 
@@ -689,8 +654,8 @@
 
         const button2 = document.createElement("button");
         button2.classList.add("pair-button");
-        const img2 = createBeerImg(beer2 ? beer2.img : "", pair[1], 'beer-emoji-fallback-lg');
-        button2.appendChild(img2);
+        const emoji2 = createBeerEmoji('beer-emoji-fallback-lg');
+        button2.appendChild(emoji2);
         button2.appendChild(document.createTextNode(pair[1]));
         button2.onclick = () => callback(pair[1]);
 
@@ -701,8 +666,8 @@
     }
 
     function displayRanking() {
-        // Complete the progress bar
-        completedComparisons = totalComparisons;
+        // Complete the progress bar with actual count
+        totalComparisons = completedComparisons;
         updateProgress();
 
         document.getElementById("pairwiseContainer").style.display = "none";
@@ -713,20 +678,19 @@
         rankingList.innerHTML = "";
 
         rankedBeers.forEach((beerName, index) => {
-            const beer = getBeerByName(beerName);
             const listItem = document.createElement("li");
 
             const rankSpan = document.createElement("span");
             rankSpan.classList.add("rank-number");
             rankSpan.textContent = `#${index + 1}`;
 
-            const img = createBeerImg(beer ? beer.img : "", beerName, 'beer-emoji-fallback');
+            const emoji = createBeerEmoji('beer-emoji-fallback');
 
             const nameSpan = document.createElement("span");
             nameSpan.textContent = beerName;
 
             listItem.appendChild(rankSpan);
-            listItem.appendChild(img);
+            listItem.appendChild(emoji);
             listItem.appendChild(nameSpan);
             rankingList.appendChild(listItem);
         });
@@ -759,7 +723,7 @@
         rankedBeers.forEach((beer, index) => {
             text += `${index + 1}. ${beer}\n`;
         });
-        text += "\nRank your own beers at this site!";
+        text += `\nRank your own beers at ${SITE_URL}`;
         return text;
     }
 
@@ -774,12 +738,12 @@
 
     function shareTwitter() {
         const top3 = rankedBeers.slice(0, 3).map((b, i) => `${i + 1}. ${b}`).join(', ');
-        const text = encodeURIComponent(`My top 3 beers: ${top3} - Rank yours!`);
+        const text = encodeURIComponent(`My top 3 beers: ${top3}\n\nRank yours at ${SITE_URL}`);
         window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
     }
 
     function shareFacebook() {
-        const text = encodeURIComponent(`My top beer is ${rankedBeers[0]}! What's yours?`);
+        const text = encodeURIComponent(`My top beer is ${rankedBeers[0]}! What's yours?\n\n${SITE_URL}`);
         window.open(`https://www.facebook.com/sharer/sharer.php?quote=${text}`, '_blank');
     }
 
