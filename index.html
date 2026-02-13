@@ -7,38 +7,54 @@
     <style>
         * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, 'Helvetica Neue', 'Segoe UI', sans-serif;
             text-align: left;
             margin: 0 auto;
             max-width: 700px;
-            padding: 0 16px;
-            color: #222;
-        }
-        #beerImage {
-            width: 100px;
-            margin: 20px 0;
+            padding: 0 16px 40px;
+            background: #000;
+            color: #f5f5f7;
+            font-weight: 300;
+            letter-spacing: 0.01em;
         }
         h1 {
             margin-bottom: 4px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        h3 {
+            font-weight: 500;
+            color: #e0e0e5;
+        }
+        p {
+            color: #8e8e93;
+        }
+        #beerImage {
+            width: 80px;
+            margin: 24px 0 8px;
+            border-radius: 8px;
         }
 
         /* Progress Bar */
         #progressContainer {
             display: none;
             margin: 16px 0;
-            background: #e0e0e0;
-            border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
             overflow: hidden;
-            height: 24px;
+            height: 28px;
             position: relative;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         #progressBar {
             height: 100%;
-            background: linear-gradient(90deg, #f7b733, #fc4a1a);
-            border-radius: 10px;
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, #0a84ff, #5e5ce6);
+            border-radius: 12px;
+            transition: width 0.35s ease;
             width: 0%;
         }
         #progressText {
@@ -50,9 +66,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
-            font-weight: bold;
-            color: #333;
+            font-size: 12px;
+            font-weight: 500;
+            color: #f5f5f7;
+            letter-spacing: 0.02em;
         }
 
         /* Selection Form */
@@ -68,51 +85,85 @@
         #beerSelectionForm label {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 8px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            gap: 10px;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: all 0.2s ease;
         }
         #beerSelectionForm label:hover {
-            background: #f5f5f5;
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
         }
-        #beerSelectionForm label img {
+        #beerSelectionForm label:has(input:checked) {
+            background: rgba(255,59,48,0.15);
+            border-color: rgba(255,59,48,0.4);
+        }
+        #beerSelectionForm label img,
+        #beerSelectionForm label .beer-emoji-fallback {
             width: 36px;
             height: 36px;
             object-fit: contain;
-            border-radius: 4px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+        .beer-emoji-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
         }
         #beerSelectionForm label span {
             font-size: 14px;
+            color: #f5f5f7;
+        }
+        #beerSelectionForm input[type="checkbox"] {
+            accent-color: #ff3b30;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
         }
         #startRanking {
-            padding: 12px 28px;
+            padding: 14px 32px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            background-color: #007BFF;
+            background: #0a84ff;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 14px;
+            letter-spacing: 0.01em;
+            transition: all 0.2s ease;
         }
         #startRanking:hover {
-            background-color: #0056b3;
+            background: #0070e0;
+            transform: scale(1.02);
+        }
+        #startRanking:active {
+            transform: scale(0.98);
         }
 
         /* Pairwise Comparison */
         #pairwiseContainer {
             display: none;
         }
+        #pairwiseContainer p {
+            color: #8e8e93;
+        }
         .pair {
             margin: 10px 0;
             padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
             display: flex;
             justify-content: space-around;
             align-items: stretch;
-            gap: 20px;
+            gap: 16px;
         }
         .pair-button {
             flex: 1;
@@ -120,31 +171,44 @@
             flex-direction: column;
             align-items: center;
             gap: 10px;
-            padding: 16px 10px;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 20px 10px;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            background: #fafafa;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            transition: all 0.15s;
+            background: rgba(255,255,255,0.06);
+            color: #f5f5f7;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            transition: all 0.2s ease;
         }
         .pair-button:hover {
-            background-color: #e8f0fe;
-            border-color: #007BFF;
-            transform: scale(1.02);
+            background: rgba(10,132,255,0.15);
+            border-color: #0a84ff;
+            transform: scale(1.03);
         }
-        .pair-button img {
+        .pair-button:active {
+            transform: scale(0.97);
+        }
+        .pair-button img,
+        .pair-button .beer-emoji-fallback-lg {
             width: 80px;
             height: 80px;
             object-fit: contain;
         }
+        .beer-emoji-fallback-lg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
         .pair-vs {
             display: flex;
             align-items: center;
-            font-size: 22px;
-            font-weight: bold;
-            color: #999;
+            font-size: 20px;
+            font-weight: 600;
+            color: #48484a;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
         /* Rankings */
@@ -156,54 +220,77 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 8px 10px;
-            margin: 4px 0;
-            border-radius: 8px;
+            padding: 12px 14px;
+            margin: 6px 0;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: background 0.2s;
         }
         #beers li:nth-child(-n+3) {
-            background: linear-gradient(90deg, #fff9e6, #fff);
+            background: rgba(255,214,10,0.08);
+            border-color: rgba(255,214,10,0.15);
         }
-        #beers li img {
+        #beers li img,
+        #beers li .beer-emoji-fallback {
             width: 40px;
             height: 40px;
             object-fit: contain;
         }
         .rank-number {
-            font-weight: bold;
-            min-width: 28px;
-            color: #555;
+            font-weight: 600;
+            min-width: 32px;
+            color: #8e8e93;
         }
-        #beers li:nth-child(1) .rank-number { color: #d4a017; font-size: 20px; }
-        #beers li:nth-child(2) .rank-number { color: #888; font-size: 18px; }
-        #beers li:nth-child(3) .rank-number { color: #a0522d; font-size: 17px; }
+        #beers li:nth-child(1) .rank-number { color: #ffd60a; font-size: 20px; }
+        #beers li:nth-child(2) .rank-number { color: #98989d; font-size: 18px; }
+        #beers li:nth-child(3) .rank-number { color: #ac8e68; font-size: 17px; }
 
         #omittedBeers {
             margin-top: 20px;
+        }
+        #omittedList {
+            list-style: none;
+            padding: 0;
+        }
+        #omittedList li {
+            padding: 8px 14px;
+            margin: 4px 0;
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+            color: #8e8e93;
+            font-size: 14px;
         }
 
         /* Buttons */
         #restartButton, #shareButton {
             display: none;
             margin-top: 12px;
-            padding: 12px 24px;
+            padding: 14px 28px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
             border: none;
-            border-radius: 5px;
+            border-radius: 14px;
             color: white;
+            letter-spacing: 0.01em;
+            transition: all 0.2s ease;
         }
         #restartButton {
-            background-color: #007BFF;
+            background: #0a84ff;
         }
         #restartButton:hover {
-            background-color: #0056b3;
+            background: #0070e0;
         }
         #shareButton {
-            background-color: #28a745;
+            background: #30d158;
             margin-left: 8px;
         }
         #shareButton:hover {
-            background-color: #1e7e34;
+            background: #28b84c;
+        }
+        #restartButton:active, #shareButton:active {
+            transform: scale(0.97);
         }
         .button-row {
             display: flex;
@@ -217,7 +304,9 @@
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: 100;
             justify-content: center;
             align-items: center;
@@ -226,15 +315,17 @@
             display: flex;
         }
         .share-content {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
+            background: #1c1c1e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 28px;
             max-width: 440px;
             width: 90%;
             text-align: center;
         }
         .share-content h3 {
             margin-top: 0;
+            color: #f5f5f7;
         }
         .share-options {
             display: flex;
@@ -243,34 +334,41 @@
             margin: 16px 0;
         }
         .share-btn {
-            padding: 12px;
+            padding: 14px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
             color: white;
-            font-weight: bold;
+            transition: all 0.2s ease;
         }
-        .share-btn.copy { background: #555; }
-        .share-btn.copy:hover { background: #333; }
+        .share-btn:active {
+            transform: scale(0.97);
+        }
+        .share-btn.copy { background: #48484a; }
+        .share-btn.copy:hover { background: #636366; }
         .share-btn.twitter { background: #1da1f2; }
         .share-btn.twitter:hover { background: #0c85d0; }
         .share-btn.facebook { background: #1877f2; }
         .share-btn.facebook:hover { background: #0d5ecf; }
-        .share-btn.sms { background: #34c759; }
-        .share-btn.sms:hover { background: #28a03e; }
+        .share-btn.sms { background: #30d158; }
+        .share-btn.sms:hover { background: #28b84c; }
         .share-close {
             margin-top: 10px;
-            padding: 8px 20px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            background: white;
+            padding: 10px 24px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            background: transparent;
+            color: #0a84ff;
             cursor: pointer;
             font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
         }
-        .share-close:hover { background: #f5f5f5; }
+        .share-close:hover { background: rgba(255,255,255,0.06); }
         #copyConfirm {
-            color: #28a745;
+            color: #30d158;
             font-size: 13px;
             margin-top: 4px;
             display: none;
@@ -279,7 +377,7 @@
 </head>
 <body>
     <!-- Beer Clip Art -->
-    <img id="beerImage" src="https://www.shutterstock.com/shutterstock/photos/1497355484/display_1500/stock-vector-beer-mug-vector-clipart-design-1497355484.jpg" alt="Beer Clip Art">
+    <img id="beerImage" src="https://www.shutterstock.com/shutterstock/photos/1497355484/display_1500/stock-vector-beer-mug-vector-clipart-design-1497355484.jpg" alt="Beer Clip Art" onerror="this.style.display='none'">
 
     <h1>Beers Pairwise Ranking</h1>
     <p id="introMessage">Select beers you've never tried, and they will be omitted from the rankings.</p>
@@ -287,7 +385,7 @@
     <!-- Progress Bar -->
     <div id="progressContainer">
         <div id="progressBar"></div>
-        <div id="progressText">0%</div>
+        <div id="progressText">0 of 0 comparisons</div>
     </div>
 
     <!-- Step 1: Beer Selection -->
@@ -334,6 +432,8 @@
     </div>
 
 <script>
+    const BEER_EMOJI = '\u{1F37A}';
+
     const beers = [
         {
             name: "Bud Light",
@@ -431,11 +531,29 @@
     function updateProgress() {
         const pct = totalComparisons > 0 ? Math.min(Math.round((completedComparisons / totalComparisons) * 100), 100) : 0;
         document.getElementById('progressBar').style.width = pct + '%';
-        document.getElementById('progressText').textContent = pct + '%';
+        document.getElementById('progressText').textContent =
+            completedComparisons + ' of ~' + totalComparisons + ' comparisons (' + pct + '%)';
     }
 
     function getBeerByName(name) {
         return beers.find(b => b.name === name);
+    }
+
+    // Create a fallback element for when images fail to load
+    function createBeerImg(src, alt, cssClass) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = alt;
+        img.loading = 'lazy';
+        img.onerror = function() {
+            const fallback = document.createElement('div');
+            fallback.className = cssClass || 'beer-emoji-fallback';
+            fallback.textContent = BEER_EMOJI;
+            fallback.setAttribute('role', 'img');
+            fallback.setAttribute('aria-label', alt);
+            this.parentNode.replaceChild(fallback, this);
+        };
+        return img;
     }
 
     function generateSelectionForm() {
@@ -449,9 +567,7 @@
             checkbox.value = beer.name;
             checkbox.id = `beer-${index}`;
 
-            const img = document.createElement('img');
-            img.src = beer.img;
-            img.alt = beer.name;
+            const img = createBeerImg(beer.img, beer.name, 'beer-emoji-fallback');
 
             const span = document.createElement('span');
             span.textContent = beer.name;
@@ -562,9 +678,7 @@
 
         const button1 = document.createElement("button");
         button1.classList.add("pair-button");
-        const img1 = document.createElement("img");
-        img1.src = beer1 ? beer1.img : "";
-        img1.alt = pair[0];
+        const img1 = createBeerImg(beer1 ? beer1.img : "", pair[0], 'beer-emoji-fallback-lg');
         button1.appendChild(img1);
         button1.appendChild(document.createTextNode(pair[0]));
         button1.onclick = () => callback(pair[0]);
@@ -575,9 +689,7 @@
 
         const button2 = document.createElement("button");
         button2.classList.add("pair-button");
-        const img2 = document.createElement("img");
-        img2.src = beer2 ? beer2.img : "";
-        img2.alt = pair[1];
+        const img2 = createBeerImg(beer2 ? beer2.img : "", pair[1], 'beer-emoji-fallback-lg');
         button2.appendChild(img2);
         button2.appendChild(document.createTextNode(pair[1]));
         button2.onclick = () => callback(pair[1]);
@@ -608,9 +720,7 @@
             rankSpan.classList.add("rank-number");
             rankSpan.textContent = `#${index + 1}`;
 
-            const img = document.createElement("img");
-            img.src = beer ? beer.img : "";
-            img.alt = beerName;
+            const img = createBeerImg(beer ? beer.img : "", beerName, 'beer-emoji-fallback');
 
             const nameSpan = document.createElement("span");
             nameSpan.textContent = beerName;
