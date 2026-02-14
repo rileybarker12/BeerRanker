@@ -500,7 +500,7 @@
     function estimateComparisons(n) {
         if (n <= 1) return 0;
         // Average case is closer to n*log2(n), not n*ceil(log2(n))
-        return Math.floor(n * Math.log2(n) * 1.2); // 1.2x for safety margin
+        return Math.floor(n * Math.log2(n)); // 1.2x for safety margin
     }
 
     function updateProgress() {
