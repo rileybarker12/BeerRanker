@@ -419,13 +419,11 @@
             display: none;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <!-- Neon Beer Ranker Header -->
     <div id="neonHeader">BEER RANKER</div>
 
-    <h1>Beers Pairwise Ranking</h1>
     <p id="introMessage">Select beers you've never tried, and they will be omitted from the rankings.</p>
 
     <!-- Progress Bar -->
@@ -474,10 +472,10 @@
     <!-- Share Modal -->
     <div id="shareModal">
         <div class="share-content">
-            <h3>Share Your Top 3 Beers</h3>
-            <p style="margin-top: 0; color: #aaa; font-size: 14px;">A screenshot of your top 3 beers will be generated</p>
+            <h3>Share Your Top 5 Beers</h3>
+            <p style="margin-top: 0; color: #aaa; font-size: 14px;">Share your rankings with friends</p>
             <div class="share-options">
-                <button class="share-btn copy" onclick="copyRankings()">Copy Screenshot to Clipboard</button>
+                <button class="share-btn copy" onclick="copyRankings()">Copy to Clipboard</button>
                 <p id="copyConfirm">✓ Copied to clipboard!</p>
                 <button class="share-btn twitter" onclick="shareTwitter()">Share on X (Twitter)</button>
                 <button class="share-btn facebook" onclick="shareFacebook()">Share on Facebook</button>
@@ -751,185 +749,34 @@
     }
 
     function getRankingsText() {
-        let text = "My Beer Rankings:\n";
-        rankedBeers.forEach((beer, index) => {
+        let text = "My top 5 beers! 🍺\n\n";
+        const top5 = rankedBeers.slice(0, 5);
+        top5.forEach((beer, index) => {
             text += `${index + 1}. ${beer}\n`;
         });
-        text += `\nRank your own beers at ${SITE_URL}`;
+        text += `\nRank yours at ${SITE_URL}`;
         return text;
     }
 
-    async function generateTop3Screenshot() {
-        // Create a temporary container for the screenshot
-        const container = document.createElement('div');
-        container.style.cssText = `
-            position: fixed;
-            left: -9999px;
-            width: 600px;
-            padding: 40px;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        `;
-
-        // Add header
-        const header = document.createElement('div');
-        header.style.cssText = `
-            text-align: center;
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 30px;
-            color: #00d4ff;
-            text-shadow: 0 0 20px rgba(0,212,255,0.5);
-        `;
-        header.textContent = '🍺 MY TOP 3 BEERS';
-        container.appendChild(header);
-
-        // Add top 3 beers
-        const top3 = rankedBeers.slice(0, 3);
-        top3.forEach((beerName, index) => {
-            const beerItem = document.createElement('div');
-            beerItem.style.cssText = `
-                display: flex;
-                align-items: center;
-                gap: 20px;
-                padding: 20px;
-                margin-bottom: 15px;
-                background: rgba(255,255,255,0.1);
-                border-radius: 15px;
-                backdrop-filter: blur(10px);
-            `;
-
-            const rank = document.createElement('div');
-            rank.style.cssText = `
-                font-size: 32px;
-                font-weight: bold;
-                color: ${index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : '#CD7F32'};
-                min-width: 50px;
-            `;
-            rank.textContent = `#${index + 1}`;
-
-            const img = createBeerImage(beerName, 'beer-emoji-fallback-lg');
-            img.style.cssText = `
-                width: 80px;
-                height: 80px;
-                object-fit: contain;
-            `;
-
-            const name = document.createElement('div');
-            name.style.cssText = `
-                font-size: 24px;
-                color: #f5f5f7;
-                flex: 1;
-            `;
-            name.textContent = beerName;
-
-            beerItem.appendChild(rank);
-            beerItem.appendChild(img);
-            beerItem.appendChild(name);
-            container.appendChild(beerItem);
+    function copyRankings() {
+        const text = getRankingsText();
+        navigator.clipboard.writeText(text).then(() => {
+            const confirm = document.getElementById('copyConfirm');
+            confirm.style.display = 'block';
+            setTimeout(() => { confirm.style.display = 'none'; }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
         });
-
-        // Add footer
-        const footer = document.createElement('div');
-        footer.style.cssText = `
-            text-align: center;
-            margin-top: 30px;
-            font-size: 18px;
-            color: #00d4ff;
-        `;
-        footer.textContent = 'Rank yours at rileybarker12.github.io/BeerRanker';
-        container.appendChild(footer);
-
-        document.body.appendChild(container);
-
-        // Generate screenshot
-        const canvas = await html2canvas(container, {
-            backgroundColor: null,
-            scale: 2
-        });
-
-        // Remove temporary container
-        document.body.removeChild(container);
-
-        return canvas;
     }
 
-    async function copyRankings() {
-        try {
-            const canvas = await generateTop3Screenshot();
-            canvas.toBlob(async (blob) => {
-                try {
-                    // Try to copy image to clipboard (works in modern browsers)
-                    await navigator.clipboard.write([
-                        new ClipboardItem({
-                            'image/png': blob
-                        })
-                    ]);
-                    const confirm = document.getElementById('copyConfirm');
-                    confirm.textContent = '✓ Screenshot copied to clipboard!';
-                    confirm.style.display = 'block';
-                    setTimeout(() => {
-                        confirm.style.display = 'none';
-                        confirm.textContent = '✓ Copied to clipboard!';
-                    }, 2000);
-                } catch (err) {
-                    // Fallback: copy text instead
-                    const text = getRankingsText();
-                    await navigator.clipboard.writeText(text);
-                    const confirm = document.getElementById('copyConfirm');
-                    confirm.style.display = 'block';
-                    setTimeout(() => { confirm.style.display = 'none'; }, 2000);
-                }
-            });
-        } catch (err) {
-            // Fallback to text-only
-            const text = getRankingsText();
-            navigator.clipboard.writeText(text).then(() => {
-                const confirm = document.getElementById('copyConfirm');
-                confirm.style.display = 'block';
-                setTimeout(() => { confirm.style.display = 'none'; }, 2000);
-            });
-        }
+    function shareTwitter() {
+        const text = encodeURIComponent(getRankingsText());
+        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
     }
 
-    async function shareTwitter() {
-        const canvas = await generateTop3Screenshot();
-
-        // Download the screenshot
-        canvas.toBlob((blob) => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'my-top-3-beers.png';
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        // Open Twitter with text (user will upload the downloaded image)
-        setTimeout(() => {
-            const text = encodeURIComponent(`My top 3 beers! 🍺\n\nRank yours at ${SITE_URL}`);
-            window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
-        }, 500);
-    }
-
-    async function shareFacebook() {
-        const canvas = await generateTop3Screenshot();
-
-        // Download the screenshot
-        canvas.toBlob((blob) => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'my-top-3-beers.png';
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        // Open Facebook sharer
-        setTimeout(() => {
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`, '_blank');
-        }, 500);
+    function shareFacebook() {
+        const text = encodeURIComponent(getRankingsText());
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}&quote=${text}`, '_blank');
     }
 
     function shareSMS() {
