@@ -749,12 +749,12 @@
     }
 
     function getRankingsText() {
-        let text = "My Top 5 Beer Rankings:\n";
+        let text = "My top 5 beers! 🍺\n\n";
         const top5 = rankedBeers.slice(0, 5);
         top5.forEach((beer, index) => {
             text += `${index + 1}. ${beer}\n`;
         });
-        text += `\nRank your own beers at ${SITE_URL}`;
+        text += `\nRank yours at ${SITE_URL}`;
         return text;
     }
 
@@ -770,12 +770,13 @@
     }
 
     function shareTwitter() {
-        const text = encodeURIComponent(`My top 5 beers! 🍺\n\nRank yours at ${SITE_URL}`);
+        const text = encodeURIComponent(getRankingsText());
         window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
     }
 
     function shareFacebook() {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`, '_blank');
+        const text = encodeURIComponent(getRankingsText());
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}&quote=${text}`, '_blank');
     }
 
     function shareSMS() {
