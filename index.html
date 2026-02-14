@@ -332,6 +332,18 @@
             flex-wrap: wrap;
         }
 
+        /* GIF Containers */
+        .gif-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .gif-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
         /* Share Modal */
         #shareModal {
             display: none;
@@ -429,12 +441,21 @@
             <!-- Checkboxes will be added dynamically -->
         </form>
         <button id="startRanking">Start Ranking</button>
+
+        <!-- GIF spot below start ranking button -->
+        <div class="gif-container">
+            <img src="images/beers/bosh2.gif" alt="Beer GIF" id="openingGif">
+        </div>
     </div>
 
     <!-- Step 2: Pairwise Comparison -->
     <div id="pairwiseContainer"></div>
 
     <!-- Final Rankings -->
+    <!-- GIF spot at top of final rankings -->
+    <div class="gif-container" id="rankingsGifContainer" style="display: none;">
+        <img src="images/beers/bosh1.gif" alt="Rankings GIF" id="rankingsGif">
+    </div>
     <h3 id="finalRankingHeading" style="display: none;">Final Rankings:</h3>
     <ul id="beers"></ul>
 
@@ -484,7 +505,7 @@
         { name: "Dos Equis", image: "images/beers/dos-equis.jpg" },
         { name: "Blue Moon", image: "images/beers/blue-moon.jpg" },
         { name: "Stella Artois", image: "images/beers/stella-artois.png" },
-        { name: "Guinness", image: "images/beers/guinness.png" },
+        { name: "Guinness", image: "images/beers/guinness.jpg" },
         { name: "Yuengling", image: "images/beers/yuengling.webp" },
         { name: "Pabst Blue Ribbon", image: "images/beers/pabst-blue-ribbon.png" },
         { name: "Shiner", image: "images/beers/shiner.jpg" },
@@ -682,6 +703,7 @@
 
         document.getElementById("pairwiseContainer").style.display = "none";
         document.getElementById("progressContainer").style.display = "none";
+        document.getElementById("rankingsGifContainer").style.display = 'block';
         document.getElementById("finalRankingHeading").style.display = 'block';
 
         const rankingList = document.getElementById("beers");
