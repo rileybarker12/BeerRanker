@@ -407,6 +407,7 @@
             display: none;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <!-- Neon Beer Ranker Header -->
@@ -452,10 +453,11 @@
     <!-- Share Modal -->
     <div id="shareModal">
         <div class="share-content">
-            <h3>Share Your Rankings</h3>
+            <h3>Share Your Top 3 Beers</h3>
+            <p style="margin-top: 0; color: #aaa; font-size: 14px;">A screenshot of your top 3 beers will be generated</p>
             <div class="share-options">
-                <button class="share-btn copy" onclick="copyRankings()">Copy to Clipboard</button>
-                <p id="copyConfirm">Copied!</p>
+                <button class="share-btn copy" onclick="copyRankings()">Copy Screenshot to Clipboard</button>
+                <p id="copyConfirm">✓ Copied to clipboard!</p>
                 <button class="share-btn twitter" onclick="shareTwitter()">Share on X (Twitter)</button>
                 <button class="share-btn facebook" onclick="shareFacebook()">Share on Facebook</button>
                 <button class="share-btn sms" onclick="shareSMS()">Share via Text Message</button>
@@ -469,26 +471,26 @@
     const SITE_URL = 'https://rileybarker12.github.io/BeerRanker/';
 
     const beers = [
-        { name: "Bud Light" },
-        { name: "Modelo Especial" },
-        { name: "Michelob Ultra" },
-        { name: "Coors Light" },
-        { name: "Miller Lite" },
-        { name: "Corona Extra" },
-        { name: "Budweiser" },
-        { name: "Heineken" },
-        { name: "Busch Light" },
-        { name: "Natural Light" },
-        { name: "Dos Equis" },
-        { name: "Blue Moon" },
-        { name: "Stella Artois" },
-        { name: "Guinness" },
-        { name: "Yuengling" },
-        { name: "Pabst Blue Ribbon" },
-        { name: "Shiner" },
-        { name: "Miller High Life" },
-        { name: "Keystone Light" },
-        { name: "Coors Banquet" }
+        { name: "Bud Light", image: "images/beers/bud-light.jpg" },
+        { name: "Modelo Especial", image: "images/beers/modelo-especial.png" },
+        { name: "Michelob Ultra", image: "images/beers/michelob-ultra.jpeg" },
+        { name: "Coors Light", image: "images/beers/coors-light.webp" },
+        { name: "Miller Lite", image: "images/beers/miller-lite.svg" },
+        { name: "Corona Extra", image: "images/beers/corona-extra.png" },
+        { name: "Budweiser", image: "images/beers/budweiser.jpg" },
+        { name: "Heineken", image: "images/beers/heineken.png" },
+        { name: "Busch Light", image: "images/beers/busch-light.png" },
+        { name: "Natural Light", image: "images/beers/natural-light.png" },
+        { name: "Dos Equis", image: "images/beers/dos-equis.jpg" },
+        { name: "Blue Moon", image: "images/beers/blue-moon.jpg" },
+        { name: "Stella Artois", image: "images/beers/stella-artois.png" },
+        { name: "Guinness", image: "images/beers/guinness.png" },
+        { name: "Yuengling", image: "images/beers/yuengling.webp" },
+        { name: "Pabst Blue Ribbon", image: "images/beers/pabst-blue-ribbon.png" },
+        { name: "Shiner", image: "images/beers/shiner.jpg" },
+        { name: "Miller High Life", image: "images/beers/miller-high-life.png" },
+        { name: "Keystone Light", image: "images/beers/keystone-light.jpg" },
+        { name: "Coors Banquet", image: "images/beers/coors-banquet.webp" }
     ];
 
     let untriedBeers = new Set();
@@ -514,14 +516,22 @@
         return beers.find(b => b.name === name);
     }
 
-    // Create beer emoji fallback (no images, just emoji)
-    function createBeerEmoji(cssClass) {
-        const fallback = document.createElement('div');
-        fallback.className = cssClass || 'beer-emoji-fallback';
-        fallback.textContent = BEER_EMOJI;
-        fallback.setAttribute('role', 'img');
-        fallback.setAttribute('aria-label', 'Beer');
-        return fallback;
+    // Create beer image element
+    function createBeerImage(beerNameOrObject, cssClass) {
+        // Find the beer object
+        let beer;
+        if (typeof beerNameOrObject === 'string') {
+            beer = beers.find(b => b.name === beerNameOrObject);
+        } else {
+            beer = beerNameOrObject;
+        }
+
+        const img = document.createElement('img');
+        img.className = cssClass || 'beer-emoji-fallback';
+        img.src = beer ? beer.image : '';
+        img.alt = beer ? beer.name : 'Beer';
+        img.setAttribute('role', 'img');
+        return img;
     }
 
     function generateSelectionForm() {
@@ -535,7 +545,7 @@
             checkbox.value = beer.name;
             checkbox.id = `beer-${index}`;
 
-            const emoji = createBeerEmoji('beer-emoji-fallback');
+            const emoji = createBeerImage(beer, 'beer-emoji-fallback');
 
             const span = document.createElement('span');
             span.textContent = beer.name;
@@ -643,7 +653,7 @@
 
         const button1 = document.createElement("button");
         button1.classList.add("pair-button");
-        const emoji1 = createBeerEmoji('beer-emoji-fallback-lg');
+        const emoji1 = createBeerImage(pair[0], 'beer-emoji-fallback-lg');
         button1.appendChild(emoji1);
         button1.appendChild(document.createTextNode(pair[0]));
         button1.onclick = () => callback(pair[0]);
@@ -654,7 +664,7 @@
 
         const button2 = document.createElement("button");
         button2.classList.add("pair-button");
-        const emoji2 = createBeerEmoji('beer-emoji-fallback-lg');
+        const emoji2 = createBeerImage(pair[1], 'beer-emoji-fallback-lg');
         button2.appendChild(emoji2);
         button2.appendChild(document.createTextNode(pair[1]));
         button2.onclick = () => callback(pair[1]);
@@ -684,7 +694,7 @@
             rankSpan.classList.add("rank-number");
             rankSpan.textContent = `#${index + 1}`;
 
-            const emoji = createBeerEmoji('beer-emoji-fallback');
+            const emoji = createBeerImage(beerName, 'beer-emoji-fallback');
 
             const nameSpan = document.createElement("span");
             nameSpan.textContent = beerName;
@@ -727,24 +737,177 @@
         return text;
     }
 
-    function copyRankings() {
-        const text = getRankingsText();
-        navigator.clipboard.writeText(text).then(() => {
-            const confirm = document.getElementById('copyConfirm');
-            confirm.style.display = 'block';
-            setTimeout(() => { confirm.style.display = 'none'; }, 2000);
+    async function generateTop3Screenshot() {
+        // Create a temporary container for the screenshot
+        const container = document.createElement('div');
+        container.style.cssText = `
+            position: fixed;
+            left: -9999px;
+            width: 600px;
+            padding: 40px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        `;
+
+        // Add header
+        const header = document.createElement('div');
+        header.style.cssText = `
+            text-align: center;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0,212,255,0.5);
+        `;
+        header.textContent = '🍺 MY TOP 3 BEERS';
+        container.appendChild(header);
+
+        // Add top 3 beers
+        const top3 = rankedBeers.slice(0, 3);
+        top3.forEach((beerName, index) => {
+            const beerItem = document.createElement('div');
+            beerItem.style.cssText = `
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                padding: 20px;
+                margin-bottom: 15px;
+                background: rgba(255,255,255,0.1);
+                border-radius: 15px;
+                backdrop-filter: blur(10px);
+            `;
+
+            const rank = document.createElement('div');
+            rank.style.cssText = `
+                font-size: 32px;
+                font-weight: bold;
+                color: ${index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : '#CD7F32'};
+                min-width: 50px;
+            `;
+            rank.textContent = `#${index + 1}`;
+
+            const img = createBeerImage(beerName, 'beer-emoji-fallback-lg');
+            img.style.cssText = `
+                width: 80px;
+                height: 80px;
+                object-fit: contain;
+            `;
+
+            const name = document.createElement('div');
+            name.style.cssText = `
+                font-size: 24px;
+                color: #f5f5f7;
+                flex: 1;
+            `;
+            name.textContent = beerName;
+
+            beerItem.appendChild(rank);
+            beerItem.appendChild(img);
+            beerItem.appendChild(name);
+            container.appendChild(beerItem);
         });
+
+        // Add footer
+        const footer = document.createElement('div');
+        footer.style.cssText = `
+            text-align: center;
+            margin-top: 30px;
+            font-size: 18px;
+            color: #00d4ff;
+        `;
+        footer.textContent = 'Rank yours at rileybarker12.github.io/BeerRanker';
+        container.appendChild(footer);
+
+        document.body.appendChild(container);
+
+        // Generate screenshot
+        const canvas = await html2canvas(container, {
+            backgroundColor: null,
+            scale: 2
+        });
+
+        // Remove temporary container
+        document.body.removeChild(container);
+
+        return canvas;
     }
 
-    function shareTwitter() {
-        const top3 = rankedBeers.slice(0, 3).map((b, i) => `${i + 1}. ${b}`).join(', ');
-        const text = encodeURIComponent(`My top 3 beers: ${top3}\n\nRank yours at ${SITE_URL}`);
-        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+    async function copyRankings() {
+        try {
+            const canvas = await generateTop3Screenshot();
+            canvas.toBlob(async (blob) => {
+                try {
+                    // Try to copy image to clipboard (works in modern browsers)
+                    await navigator.clipboard.write([
+                        new ClipboardItem({
+                            'image/png': blob
+                        })
+                    ]);
+                    const confirm = document.getElementById('copyConfirm');
+                    confirm.textContent = '✓ Screenshot copied to clipboard!';
+                    confirm.style.display = 'block';
+                    setTimeout(() => {
+                        confirm.style.display = 'none';
+                        confirm.textContent = '✓ Copied to clipboard!';
+                    }, 2000);
+                } catch (err) {
+                    // Fallback: copy text instead
+                    const text = getRankingsText();
+                    await navigator.clipboard.writeText(text);
+                    const confirm = document.getElementById('copyConfirm');
+                    confirm.style.display = 'block';
+                    setTimeout(() => { confirm.style.display = 'none'; }, 2000);
+                }
+            });
+        } catch (err) {
+            // Fallback to text-only
+            const text = getRankingsText();
+            navigator.clipboard.writeText(text).then(() => {
+                const confirm = document.getElementById('copyConfirm');
+                confirm.style.display = 'block';
+                setTimeout(() => { confirm.style.display = 'none'; }, 2000);
+            });
+        }
     }
 
-    function shareFacebook() {
-        const text = encodeURIComponent(`My top beer is ${rankedBeers[0]}! What's yours?\n\n${SITE_URL}`);
-        window.open(`https://www.facebook.com/sharer/sharer.php?quote=${text}`, '_blank');
+    async function shareTwitter() {
+        const canvas = await generateTop3Screenshot();
+
+        // Download the screenshot
+        canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'my-top-3-beers.png';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Open Twitter with text (user will upload the downloaded image)
+        setTimeout(() => {
+            const text = encodeURIComponent(`My top 3 beers! 🍺\n\nRank yours at ${SITE_URL}`);
+            window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+        }, 500);
+    }
+
+    async function shareFacebook() {
+        const canvas = await generateTop3Screenshot();
+
+        // Download the screenshot
+        canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'my-top-3-beers.png';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Open Facebook sharer
+        setTimeout(() => {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`, '_blank');
+        }, 500);
     }
 
     function shareSMS() {
